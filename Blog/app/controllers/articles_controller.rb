@@ -1,5 +1,7 @@
 class ArticlesController < ApplicationController
-  http_basic_authenticate_with name: ENV['OWNER_NAME'], password: ENV['OWNER_PASSWORD'], except: [:index, :show]
+  # http_basic_authenticate_with name: ENV['OWNER_NAME'], password: ENV['OWNER_PASSWORD'], except: [:index, :show]
+  before_action :authenticate_user!, unless: :devise_controller?
+  skip_before_action :authenticate_user!, only: [:show, :index]
   def index
     @articles = Article.all
     end

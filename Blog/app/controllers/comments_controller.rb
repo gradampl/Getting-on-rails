@@ -1,5 +1,7 @@
 class CommentsController < ApplicationController
-  http_basic_authenticate_with name: ENV['OWNER_NAME'], password: ENV['OWNER_PASSWORD'], except: [:create]
+  # http_basic_authenticate_with name: ENV['OWNER_NAME'], password: ENV['OWNER_PASSWORD'], except: [:create]
+  before_action :authenticate_user!, unless: :devise_controller?
+  skip_before_action :authenticate_user!, only: [:create]
 
   def create
     find_params
