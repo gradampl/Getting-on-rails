@@ -1,10 +1,14 @@
+# frozen_string_literal: true
+
 class ArticlesController < ApplicationController
+  skip_before_action :authenticate_user!, only: %i[show index]
+
   def index
     @articles = Article.all
-    end
+  end
 
   def show
-    find_params
+    find_article
   end
 
   def new
@@ -12,7 +16,7 @@ class ArticlesController < ApplicationController
   end
 
   def edit
-    find_params
+    find_article
   end
 
   def create
@@ -26,29 +30,24 @@ class ArticlesController < ApplicationController
   end
 
   def update
-    find_params
-
-    if @article.update(article_params)
-      redirect_to @article
+    if article.update(article_params)
+      redirect_to article
     else
       render 'edit'
     end
   end
 
   def destroy
-    find_params
-    @article.destroy
+    article.destroy
 
     redirect_to articles_path
   end
 
   private
 
-  def find_params
-    @article = Article.find(params[:id])
-    end
-
-  private
+  def article
+    @article ||= Article.find(params[:id])
+  end
 
   def article_params
     params.require(:article).permit(:title, :text)
