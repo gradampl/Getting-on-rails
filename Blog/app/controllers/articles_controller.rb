@@ -8,7 +8,7 @@ class ArticlesController < ApplicationController
   end
 
   def show
-    find_article
+    article
   end
 
   def new
@@ -16,7 +16,7 @@ class ArticlesController < ApplicationController
   end
 
   def edit
-    find_article
+    article
   end
 
   def create
