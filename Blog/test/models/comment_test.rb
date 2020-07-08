@@ -4,12 +4,12 @@
 #
 # Table name: comments
 #
-#  id         :integer          not null, primary key
-#  body       :text
-#  commenter  :string
+#  id         :bigint           not null, primary key
+#  body       :text(65535)
+#  commenter  :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  article_id :integer          not null
+#  article_id :bigint           not null
 #
 # Indexes
 #
@@ -17,7 +17,7 @@
 #
 # Foreign Keys
 #
-#  article_id  (article_id => articles.id)
+#  fk_rails_...  (article_id => articles.id)
 #
 require 'test_helper'
 

@@ -2,25 +2,26 @@
 
 class ArticlesController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[show index]
+  before_action :article, only: %i[show edit update destroy]
+  before_action only: %i[edit update destroy] do
+    owner_object? @article
+  end
 
   def index
     @articles = Article.all
   end
 
-  def show
-    article
-  end
+  def show; end
 
   def new
     @article = Article.new
   end
 
-  def edit
-    article
-  end
+  def edit; end
 
   def create
     @article = Article.new(article_params)
+    @article.user = current_user
 
     if @article.save
       redirect_to @article

@@ -1,16 +1,18 @@
 # frozen_string_literal: true
 
 class CommentsController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[destroy]
+  skip_before_action :authenticate_user!, only: %i[create]
+  before_action :article, only: %i[create destroy]
+  before_action only: %i[destroy] do
+    owner_object? @article
+  end
 
   def create
-    article
     @comment = @article.comments.create(comment_params)
     redirect_to article_path(@article)
   end
 
   def destroy
-    article
     @comment = @article.comments.find(params[:id])
     @comment.destroy
     redirect_to article_path(@article)
