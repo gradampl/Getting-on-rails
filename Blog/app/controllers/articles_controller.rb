@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class ArticlesController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[show index]
   before_action :article, only: %i[show edit update destroy]
   before_action only: %i[edit update destroy] do
     owner_object? @article

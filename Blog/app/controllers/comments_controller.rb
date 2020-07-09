@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 class CommentsController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[create]
-  before_action :article, only: %i[create destroy]
+  before_action :article
   before_action only: %i[destroy] do
     owner_object? @article
   end
