@@ -9,10 +9,10 @@ class ApplicationController < ActionController::Base
   end
 
   def owner_object?(data)
-    if data.nil? || data.user_id.nil?
-      redirect_to articles_path, notice: "Action not allowed!"
-    else
+    if data&.user_id
       owner? data.user_id
+    else
+      redirect_to articles_path, notice: "Action not allowed!"
     end
   end
 end
