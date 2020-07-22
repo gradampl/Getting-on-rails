@@ -9,7 +9,9 @@
 </p>
 
 <p>
+  <% if policy(comment.article).destroy? %>
   <%= link_to 'Destroy Comment', [comment.article, comment],
                method: :delete,
                data: { confirm: 'Are you sure?' } %>
+  <% end %>    
 </p>

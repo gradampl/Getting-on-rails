@@ -2,9 +2,6 @@
 
 class CommentsController < ApplicationController
   before_action :article
-  before_action only: %i[destroy] do
-    owner_object? @article
-  end
 
   def create
     @comment = article.comments.create(comment_params)
@@ -13,6 +10,7 @@ class CommentsController < ApplicationController
 
   def destroy
     @comment = article.comments.find(params[:id])
+    authorize @comment
     @comment.destroy
     redirect_to article_path(@article)
   end

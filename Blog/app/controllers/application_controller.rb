@@ -2,17 +2,13 @@
 
 class ApplicationController < ActionController::Base
   before_action :authenticate_user!, unless: :devise_controller?
-  def owner?(user_id)
-    return if user_id == current_user.id
+  include Pundit
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
-    redirect_to articles_path, notice: "Action not allowed!!"
-  end
+  private
 
-  def owner_object?(data)
-    if data&.user_id
-      owner? data.user_id
-    else
-      redirect_to articles_path, notice: "Action not allowed!"
-    end
+  def user_not_authorized
+    flash[:warning] = "You are not authorized to perform this action."
+    redirect_to(request.referrer || root_path)
   end
 end
