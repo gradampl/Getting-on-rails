@@ -1,4 +1,5 @@
 <%= form_with(model: [ @article, @article.comments.build ], local: true) do |form| %>
+  <%= render 'shared/errors', object: form.object, nested_models: [ @comments ]%>  
   <p>
     <%= form.label :commenter %><br>
     <%= form.text_field :commenter %>
@@ -9,5 +10,5 @@
   </p>
   <p>
     <%= form.submit %>
-  </p>
+  </p>  
 <% end %>

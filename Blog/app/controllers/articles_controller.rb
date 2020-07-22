@@ -1,29 +1,29 @@
 # frozen_string_literal: true
 
 class ArticlesController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[show index]
+  before_action :article, only: %i[show edit update destroy]
 
   def index
     @articles = Article.all
+    authorize @articles
   end
 
-  def show
-    article
-  end
+  def show; end
 
   def new
     @article = Article.new
+    authorize @article
   end
 
-  def edit
-    article
-  end
+  def edit; end
 
   def create
     @article = Article.new(article_params)
+    @article.user = current_user
+    authorize @article
 
     if @article.save
-      redirect_to @article
+      redirect_to @article, notice: 'Article successfully created.'
     else
       render 'new'
     end
@@ -31,7 +31,7 @@ class ArticlesController < ApplicationController
 
   def update
     if article.update(article_params)
-      redirect_to article
+      redirect_to article, notice: 'Article successfully updated.'
     else
       render 'edit'
     end
@@ -40,16 +40,17 @@ class ArticlesController < ApplicationController
   def destroy
     article.destroy
 
-    redirect_to articles_path
+    redirect_to articles_path, notice: 'Article successfully destroyed.'
   end
 
   private
 
   def article
     @article ||= Article.find(params[:id])
+    authorize @article
   end
 
   def article_params
-    params.require(:article).permit(:title, :text)
+    params.require(:article).permit(:title, :text, :user_id)
   end
 end
