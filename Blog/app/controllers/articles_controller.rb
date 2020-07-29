@@ -23,7 +23,7 @@ class ArticlesController < ApplicationController
     authorize @article
 
     if @article.save
-      redirect_to @article, notice: 'Article successfully created.'
+      redirect_to article, notice: 'Article successfully created.'
     else
       render 'new'
     end

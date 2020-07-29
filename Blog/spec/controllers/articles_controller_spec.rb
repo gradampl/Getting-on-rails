@@ -9,17 +9,146 @@ RSpec.describe ArticlesController, type: :controller do
   login_user
 
   let(:valid_attributes) do
-    { title: "Test title!", text: "This is a test text" }
+    { title: "Test title!", text: "This is a test text", user_id: User.last.id }
   end
 
-  let(:valid_session) { {} }
+  let(:valid_attributes_2) do
+    { title: "Test title!_2", text: "This is a test text_2", user_id: User.last.id }
+  end
+
+  let(:not_valid_attributes) do
+    { title: nil || (0..3).each { |i| i.times { 'a' } } || 41.times { 'a' }, text: nil || (0..4).each { |a| a.times { 'a' } } || 301.times { 'a' }, user_id: User.last.id }
+  end
+
+  let(:article) { Article.create(valid_attributes) }
 
   describe "GET #index" do
-    it "returns a success response" do
-      Article.create! valid_attributes
-      get :index, params: {}, session: valid_session
+    it "populates an array of articles" do
+      article
+      get :index, params: {}
+      expect(assigns(:articles)).to eq([article])
+    end
+    it "is successful" do
+      article
+      get :index, params: {}
       expect(response).to be_successful # be_successful expects a HTTP Status code of 200
-      #   expect(response).to have_http_status(302) # Expects a HTTP Status code of 302
+      # expect(response).to have_http_status(302) # Expects a HTTP Status code of 302
+    end
+    it "renders the :index view" do
+      article
+      get :index, params: {}
+      expect(response).to render_template :index
+    end
+  end
+
+  describe "GET #show" do
+    it "assigns the requested article to @article" do
+      article
+      get :show, params: { id: article.id }
+      expect(assigns(:article)).to eq(article)
+    end
+    it "is successful" do
+      article
+      get :show, params: { id: article.id }
+      expect(response).to be_successful
+    end
+    it "renders the :show view" do
+      article
+      get :show, params: { id: article.id }
+      expect(response).to render_template :show
+    end
+  end
+
+  describe 'GET #new' do
+    it 'assigns a new article to @article' do
+      get :new
+      expect(assigns(:article)).to be_a_new(Article)
+    end
+  end
+
+  describe 'POST #create' do
+    context 'success' do
+      it 'creates a new article' do
+        expect do
+          post :create, params: { article: valid_attributes }
+        end.to change(Article, :count).by(1)
+      end
+      it 'redirects to the article_path' do
+        post :create, params: { article: valid_attributes }
+        expect(response).to redirect_to Article.last
+      end
+      it 'flashes the notice' do
+        post :create, params: { article: valid_attributes }
+        expect(flash[:notice]).to match('Article successfully created.')
+      end
+    end
+
+    context 'failure' do
+      it 'creates NO new article' do
+        expect do
+          post :create, params: { article: not_valid_attributes }
+        end.to change(Article, :count).by(0)
+      end
+      it 'renders the template "new"' do
+        post :create, params: { article: not_valid_attributes }
+        expect(response).to render_template :new
+      end
+    end
+  end
+
+  describe 'PUT #update' do
+    context 'success' do
+      it 'locates the requested article' do
+        put :update, params: { id: article.id, article: valid_attributes }
+        expect(assigns(:article)).to eq(article)
+      end
+      it 'changes article attributes' do
+        put :update, params: { id: article.id, article: valid_attributes_2 }
+        article.reload
+        expect(article.title).to eq('Test title!_2')
+        expect(article.text).to eq('This is a test text_2')
+      end
+      it 'redirects to the updated article' do
+        put :update, params: { id: article.id, article: valid_attributes_2 }
+        expect(response).to redirect_to Article.last
+      end
+      it 'flashes the notice' do
+        put :update, params: { id: article.id, article: valid_attributes_2 }
+        expect(flash[:notice]).to match('Article successfully updated.')
+      end
+    end
+
+    context 'failure' do
+      it 'locates the requested article' do
+        put :update, params: { id: article.id, article: valid_attributes }
+        expect(assigns(:article)).to eq(article)
+      end
+      it 'does NOT change article attributes' do
+        put :update, params: { id: article.id, article: not_valid_attributes }
+        article.reload
+        expect(article.title).to eq('Test title!')
+        expect(article.text).to eq('This is a test text')
+      end
+      it 're-renders the template "edit"' do
+        put :update, params: { id: article.id, article: not_valid_attributes }
+        expect(response).to render_template :edit
+      end
+    end
+  end
+  describe 'DELETE destroy' do
+    it "deletes the article" do
+      article
+      expect do
+        delete :destroy, params: { id: article.id }
+      end.to change(Article, :count).by(-1)
+    end
+    it "redirects to #index" do
+      delete :destroy, params: { id: article.id }
+      expect(response).to redirect_to articles_path
+    end
+    it 'flashes the notice' do
+      delete :destroy, params: { id: article.id }
+      expect(flash[:notice]).to match('Article successfully destroyed.')
     end
   end
 end
