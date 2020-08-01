@@ -5,14 +5,13 @@ class CommentsController < ApplicationController
 
   def create
     @comment = article.comments.create(comment_params)
-    redirect_to article_path(@article)
+    redirect_to article_path(@article), notice: 'Comment successfully created.'
   end
 
   def destroy
     @comment = article.comments.find(params[:id])
-    authorize @comment
     @comment.destroy
-    redirect_to article_path(@article)
+    redirect_to article_path(@article), notice: 'Comment successfully destroyed.'
   end
 
   private

@@ -20,22 +20,22 @@ RSpec.describe ArticlesController, type: :controller do
     { title: nil || (0..3).each { |i| i.times { 'a' } } || 41.times { 'a' }, text: nil || (0..4).each { |a| a.times { 'a' } } || 301.times { 'a' }, user_id: User.last.id }
   end
 
-  let(:article) { Article.create(valid_attributes) }
+  let(:not_valid_attributes_2) do
+    { title: "Test title!", text: "This is a test text", user_id: 100 }
+  end
+
+  let!(:article) { FactoryBot.create(:article, user_id: User.last.id) }
 
   describe "GET #index" do
     it "populates an array of articles" do
-      article
       get :index, params: {}
       expect(assigns(:articles)).to eq([article])
     end
     it "is successful" do
-      article
       get :index, params: {}
       expect(response).to be_successful # be_successful expects a HTTP Status code of 200
-      # expect(response).to have_http_status(302) # Expects a HTTP Status code of 302
     end
     it "renders the :index view" do
-      article
       get :index, params: {}
       expect(response).to render_template :index
     end
@@ -43,17 +43,14 @@ RSpec.describe ArticlesController, type: :controller do
 
   describe "GET #show" do
     it "assigns the requested article to @article" do
-      article
       get :show, params: { id: article.id }
       expect(assigns(:article)).to eq(article)
     end
     it "is successful" do
-      article
       get :show, params: { id: article.id }
       expect(response).to be_successful
     end
     it "renders the :show view" do
-      article
       get :show, params: { id: article.id }
       expect(response).to render_template :show
     end
@@ -126,8 +123,14 @@ RSpec.describe ArticlesController, type: :controller do
       it 'does NOT change article attributes' do
         put :update, params: { id: article.id, article: not_valid_attributes }
         article.reload
-        expect(article.title).to eq('Test title!')
-        expect(article.text).to eq('This is a test text')
+        expect(article.title).to eq('test_title')
+        expect(article.text).to eq('test_text')
+      end
+      it 'does NOT change other author\'s article attributes' do
+        put :update, params: { id: article.id, article: not_valid_attributes_2 }
+        article.reload
+        expect(article.title).to eq('test_title')
+        expect(article.text).to eq('test_text')
       end
       it 're-renders the template "edit"' do
         put :update, params: { id: article.id, article: not_valid_attributes }
@@ -137,7 +140,6 @@ RSpec.describe ArticlesController, type: :controller do
   end
   describe 'DELETE destroy' do
     it "deletes the article" do
-      article
       expect do
         delete :destroy, params: { id: article.id }
       end.to change(Article, :count).by(-1)
